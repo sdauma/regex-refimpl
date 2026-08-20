@@ -27,6 +27,8 @@ func cmdExperiment(args []string) {
 		expIPChange(20)
 	case "bench":
 		expBench()
+	case "xmatch":
+		expXMatch()
 	default:
 		log.Fatalf("未知实验: %s", args[0])
 	}
@@ -173,6 +175,50 @@ func sumMap(m map[string]int) int {
 		s += v
 	}
 	return s
+}
+
+// ---------- 实验 1b：跨协议误匹配矩阵 ----------
+
+func expXMatch() {
+	rng := rand.New(rand.NewSource(42))
+	// 每协议取一条代表性帧（真实样例优先，随机帧补充）
+	samples := []struct {
+		code  int
+		name  string
+		frame string
+	}{
+		{40, "德宝热量表", buildRandDebao(rng)},
+		{30, "普赛热量表", buildRandPusai(rng)},
+		{20, "德尔采集器", deerRealSample()},
+		{200, "琅卡博阀门", buildRandLangkabo(rng)},
+		{300, "博思达阀门", bosidaRealSample()},
+		{400, "普赛调节阀", buildRandPusaiValve(rng)},
+	}
+
+	fmt.Println("== 跨协议误匹配矩阵（行=输入协议，列=匹配模式） ==")
+	// 表头
+	fmt.Printf("%-12s", "输入\\模式")
+	for _, p := range protocolTable {
+		fmt.Printf("  %4d", p.code)
+	}
+	fmt.Println()
+	// 矩阵
+	totalCross := 0
+	for _, s := range samples {
+		fmt.Printf("%-12s", s.name)
+		for _, p := range protocolTable {
+			if p.pattern.MatchString(s.frame) {
+				fmt.Printf("    ✓")
+				if p.code != s.code {
+					totalCross++
+				}
+			} else {
+				fmt.Printf("    ×")
+			}
+		}
+		fmt.Println()
+	}
+	fmt.Printf("\n非对角线命中数: %d（0 表示完全正交）\n", totalCross)
 }
 
 func deerRealSample() string {
