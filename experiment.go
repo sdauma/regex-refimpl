@@ -228,8 +228,21 @@ func buildRandPusai(rng *rand.Rand) string {
 }
 
 func buildRandLangkabo(rng *rand.Rand) string {
-	t := []string{"0C", "0E", "0F"}[rng.Intn(3)]
-	return t + "68" + randHex(rng, 8) + randHex(rng, 2) + randHex(rng, 8) + "16"
+	// 真实帧结构（见 docs/langkabo_protocol.md §1）：
+	// 68 长度(2B,相同) 59 随机码(2B) 控制码(1B) ID(4B BCD低前) 厂家(555500) 负载(变长) 校验和(1B) 16
+	// 识别级：校验和字节随机填放（累加口径待厂家澄清，见文档 §9），不影响结构层识别。
+	id := randHex(rng, 8)        // 4B BCD 设备号，低字节在前
+	payload := randHex(rng, 2+2*rng.Intn(8)) // 负载变长（含权限/开度等，长度随控制码变化）
+	mid := "59" + randHex(rng, 4) + ctrlByte(rng) + id + "555500" + payload + randHex(rng, 2)
+	bodyLen := len(mid) / 2 // 帧头后到帧尾前的字节数（含次帧头至校验和）
+	l := fmt.Sprintf("%02X", bodyLen)
+	return "68" + l + l + mid + "16"
+}
+
+// ctrlByte 在琅卡博已知控制码中随机取一个（61阀控/63设温/6c读/ec上报/e1e3响应）
+func ctrlByte(rng *rand.Rand) string {
+	cmds := []string{"61", "63", "6C", "EC", "E1", "E3"}
+	return cmds[rng.Intn(len(cmds))]
 }
 
 func buildRandPusaiValve(rng *rand.Rand) string {

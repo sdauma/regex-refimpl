@@ -19,7 +19,7 @@ var (
 		`^EB90EB90EB90(?P<len>[0-9A-F]{2})(?P<cmd>[0-9A-F]{2})(?P<cid>[0-9A-F]{4})(?P<payload>[0-9A-F]*)(?P<cs>[0-9A-F]{2})$`)
 
 	patternLANGKABO = regexp.MustCompile(
-		`^(?P<type>[0-9CEF]{2})68(?P<addr>[0-9A-F]{8})(?P<ctrl>[0-9A-F]{2})[0-9A-F]+16$`)
+		`^68(?P<len1>[0-9A-F]{2})(?P<len2>[0-9A-F]{2})59(?P<random>[0-9A-F]{4})(?P<ctrl>[0-9A-F]{2})(?P<addr>[0-9A-F]{8})(?P<factory>[0-9A-F]{6})[0-9A-F]*(?P<cs>[0-9A-F]{2})16$`)
 
 	patternBOSIDA = regexp.MustCompile(
 		`^(?P<pre>[0-9CEF]{2,8})6850(?P<addr>[0-9A-F]{14})(?P<cmd>[0-9A-F]{2})(?P<len>[0-9A-F]{2})(?P<data>[0-9A-F]+)(?P<cs>[0-9A-F]{2})16$`)
