@@ -8,13 +8,13 @@ import (
 
 // ---------- 德尔 EB90 协议 ----------
 //
-// 帧结构：EB90EB90EB90 + LEN(1B) + CMD(1B) + 采集器标识(2B) + 载荷 + CS(1B)
+// 帧结构：EB90EB90EB90 + LEN(1B) + CMD(1B) + 集抄器标识(2B) + 载荷 + CS(1B)
 // LEN 覆盖 CMD..CS（含）；CS 为 LEN 起至载荷末字节的累加和低 8 位。
 
 const (
 	deerHeader  = "EB90EB90EB90"
-	deerCmdData = "01" // 采集器数据读取（要数）上报帧（协议文档功能码 01）
-	deerCmdBeat = "9F" // 采集器心跳 / ID 读取帧（协议文档功能码 9F）
+	deerCmdData = "01" // 集抄器数据读取（要数）上报帧（协议文档功能码 01）
+	deerCmdBeat = "9F" // 集抄器心跳 / ID 读取帧（协议文档功能码 9F）
 	deerCmdAck  = "9F" // 平台对心跳的应答帧（下行，命令码与心跳相同，错误字 00=成功）
 )
 
@@ -108,7 +108,7 @@ func parseDeerPayload(p string) []deerMeterReading {
 	return out
 }
 
-// handleDEER 处理德尔采集器上行帧：心跳/数据帧均触发地址注册
+// handleDEER 处理德尔集抄器上行帧：心跳/数据帧均触发地址注册
 func handleDEER(conn net.Conn, sub map[string]string, addr string) {
 	switch sub["cmd"] {
 	case deerCmdBeat:
@@ -129,7 +129,7 @@ func handleDEER(conn net.Conn, sub map[string]string, addr string) {
 				sub["cid"], len(readings), r.Num, r.Heat, r.Flow, r.Supply, r.ReturnT, r.Diff)
 		}
 	default:
-		// 未模拟的命令：热量表采集器的校时(89)/读时间(93)/各类设置，以及 NB 温度仪
+		// 未模拟的命令：热量表集抄器的校时(89)/读时间(93)/各类设置，以及 NB 温度仪
 		// 的历史数据(02/22)/实时数据(89)/温度补偿(84) 等均未纳入实验覆盖面。
 		log.Printf("[德尔] 未处理命令 %s（来自 %s，该命令或属未模拟设备类型）", sub["cmd"], addr)
 	}

@@ -144,7 +144,7 @@ func sendValveCommand(conn net.Conn, addr, code string, opening int, start time.
 	case <-ackCh:
 		return controlResult{Status: "success", Detail: trunc(cmd), Elapsed: time.Since(start)}
 	case <-time.After(ackTimeout):
-		return controlResult{Status: "noack", Detail: "命令已下发，3 秒内未收到阀门应答", Elapsed: time.Since(start)}
+		return controlResult{Status: "noack", Detail: "命令已下发，3 秒内未收到温控阀应答", Elapsed: time.Since(start)}
 	}
 }
 

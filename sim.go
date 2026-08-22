@@ -93,7 +93,7 @@ func nextIP(ip net.IP) net.IP {
 	return net.IP(b)
 }
 
-// ---------- 德尔采集器模拟器 ----------
+// ---------- 德尔集抄器模拟器 ----------
 
 type deerSim struct {
 	terminalSim
@@ -181,7 +181,7 @@ func cmdSimDeer(args []string) {
 	fs := flag.NewFlagSet("simdeer", flag.ExitOnError)
 	server := fs.String("server", "127.0.0.1:9047", "集控平台地址")
 	bind := fs.String("bind", "127.0.0.2", "本地源地址（模拟终端出口 IP）")
-	cid := fs.String("cid", "0A00", "采集器标识")
+	cid := fs.String("cid", "0A00", "集抄器标识")
 	beat := fs.Duration("heartbeat", 15*time.Second, "心跳周期")
 	rep := fs.Duration("report", 45*time.Second, "数据上报周期")
 	rebindAfter := fs.Int("rebindAfter", 0, "第 N 次心跳后模拟变 IP 重拨（0 表示不重拨）")
@@ -210,7 +210,7 @@ func cmdSimDeer(args []string) {
 	s.run(ctx, *rebindAfter)
 }
 
-// ---------- 博思达阀门模拟器 ----------
+// ---------- 博思达温控阀模拟器 ----------
 
 type valveSim struct {
 	terminalSim

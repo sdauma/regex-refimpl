@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ---------- 博思达阀门 MBUS 协议 ----------
+// ---------- 博思达温控阀 MBUS 协议 ----------
 //
 // 帧结构：[FE 前导] 68 50 阀门地址(7B) CMD LEN DATA CS 16
 // LEN 为 DATA 字节数；CS 为 68 起至 DATA 末字节的累加和低 8 位。
@@ -78,14 +78,14 @@ func parseBosidaReport(addr, data string) bosidaReport {
 	return r
 }
 
-// handleBOSIDA 处理博思达阀门上行帧：注册 → 上报解析 / 应答路由
+// handleBOSIDA 处理博思达温控阀上行帧：注册 → 上报解析 / 应答路由
 // （校验和已由识别路径的语义层完成，见 identifyFrame）
 func handleBOSIDA(conn net.Conn, sub map[string]string, addr string) {
 	switch sub["cmd"] {
 	case bosidaCmdReport:
 		r := parseBosidaReport(sub["addr"], sub["data"])
 		registry.register("BSD-V-"+r.Addr, addr)
-		log.Printf("[博思达] 阀门 %s 在线：开度=%d%% 室内温度raw=%d 时间=%s", r.Addr, r.Opening, r.Indoor, r.TimeBCD)
+		log.Printf("[博思达] 温控阀 %s 在线：开度=%d%% 室内温度raw=%d 时间=%s", r.Addr, r.Opening, r.Indoor, r.TimeBCD)
 		pendingRetry("BSD-V-" + r.Addr)
 	case bosidaCmdAck:
 		if c, ok := ackWaiters.Load(addr); ok {

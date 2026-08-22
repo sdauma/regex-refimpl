@@ -64,9 +64,9 @@ func expAccuracy() {
 		cases = append(cases, frameCase{20, "德尔数据帧", buildRandDeer(rng)})
 		cases = append(cases, frameCase{300, "博思达上报帧", buildRandBosida(rng)})
 		cases = append(cases, frameCase{40, "德宝帧", buildRandDebao(rng)})
-		cases = append(cases, frameCase{30, "普赛热量表帧", buildRandPusai(rng)})
-		cases = append(cases, frameCase{200, "琅卡博阀门帧", buildRandLangkabo(rng)})
-		cases = append(cases, frameCase{400, "普赛调节阀帧", buildRandPusaiValve(rng)})
+		cases = append(cases, frameCase{30, "普赛集抄器帧", buildRandPusai(rng)})
+		cases = append(cases, frameCase{200, "琅卡博温控阀帧", buildRandLangkabo(rng)})
+		cases = append(cases, frameCase{400, "普赛温控阀帧", buildRandPusaiValve(rng)})
 	}
 
 	stats := map[int]*accStat{}
@@ -116,7 +116,7 @@ func expAccuracy() {
 		}
 		fmt.Println(line)
 	}
-	fmt.Printf("按序匹配下误判总数: %d；结构歧义帧（可命中多条模式，由次序消解）: %d\n",
+	fmt.Printf("按序匹配下误判总数: %d；结构歧义帧（被多条模式同时命中，正常建模下应为0）: %d\n",
 		countWrong(stats), ambiguous)
 
 	// 畸形帧：截断 / 校验和破坏 / 随机十六进制串，
@@ -187,12 +187,12 @@ func expXMatch() {
 		name  string
 		frame string
 	}{
-		{40, "德宝热量表", buildRandDebao(rng)},
-		{30, "普赛热量表", buildRandPusai(rng)},
-		{20, "德尔采集器", deerRealSample()},
-		{200, "琅卡博阀门", buildRandLangkabo(rng)},
-		{300, "博思达阀门", bosidaRealSample()},
-		{400, "普赛调节阀", buildRandPusaiValve(rng)},
+		{40, "德宝集抄器", buildRandDebao(rng)},
+		{30, "普赛集抄器", buildRandPusai(rng)},
+		{20, "德尔集抄器", deerRealSample()},
+		{200, "琅卡博温控阀", buildRandLangkabo(rng)},
+		{300, "博思达温控阀", bosidaRealSample()},
+		{400, "普赛温控阀", buildRandPusaiValve(rng)},
 	}
 
 	fmt.Println("== 跨协议误匹配矩阵（行=输入协议，列=匹配模式） ==")
@@ -265,8 +265,8 @@ func buildRandDebao(rng *rand.Rand) string {
 	dataLen := 2 + rng.Intn(20)
 	data := randHex(rng, dataLen*2)
 	l := 9 + dataLen // LEN 覆盖控制码至校验和（含）的字节数
-	return fmt.Sprintf("68%02X%02X68%s%s%s%s%s16",
-		l, l, randHex(rng, 2), randHex(rng, 10), randHex(rng, 2), randHex(rng, 2), data)
+	return fmt.Sprintf("68%02X%02X%02X%02X68%s%s%s%s%s16",
+		l, l, l, l, randHex(rng, 2), randHex(rng, 10), randHex(rng, 2), randHex(rng, 2), data)
 }
 
 func buildRandPusai(rng *rand.Rand) string {
@@ -532,9 +532,9 @@ func expBench() {
 		{"德尔心跳帧", deerHeartbeat("0A00")},
 		{"博思达上报帧", buildRandBosida(rand.New(rand.NewSource(7)))},
 		{"德宝帧", buildRandDebao(rand.New(rand.NewSource(7)))},
-		{"普赛热量表帧", buildRandPusai(rand.New(rand.NewSource(7)))},
-		{"琅卡博阀门帧", buildRandLangkabo(rand.New(rand.NewSource(7)))},
-		{"普赛调节阀帧", buildRandPusaiValve(rand.New(rand.NewSource(7)))},
+		{"普赛集抄器帧", buildRandPusai(rand.New(rand.NewSource(7)))},
+		{"琅卡博温控阀帧", buildRandLangkabo(rand.New(rand.NewSource(7)))},
+		{"普赛温控阀帧", buildRandPusaiValve(rand.New(rand.NewSource(7)))},
 	}
 	const n = 100_000
 	for _, f := range frames {

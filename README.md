@@ -42,12 +42,12 @@ regex-refimpl experiment accuracy|ipchange|bench
 
 ## 复现论文实验
 
-配套的实验输出数据见仓库根目录：
+配套的实验输出数据位于本目录（`regex-refimpl`）：
 
-- `bench_result.txt`：性能基准结果（单帧多模式匹配时延）。
+- `bench_result.txt`：性能基准结果（单帧多模式匹配时延，对应正文引用路径 `regex-refimpl/bench_result.txt`）。
 - `ipchange_result.txt`：变 IP 反向控制恢复实验结果。
 
-论文 §4 的准确性、变 IP 反向控制、性能论据等数据均由上述命令与数据文件对应产生。
+准确性实验（`experiment accuracy`，参考实现记为 `expAccuracy`）在每次运行时由程序构造并校验 1204 条合规帧与 90 条畸形帧，不另存静态数据文件。论文第 4 章的准确性、变 IP 反向控制、性能论据等数据均由上述命令与数据文件对应产生。
 
 ## 目录说明
 

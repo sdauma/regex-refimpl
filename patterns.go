@@ -10,7 +10,7 @@ import (
 // 运行期不存在逐帧编译开销。
 var (
 	patternDEBAO = regexp.MustCompile(
-		`^68(?P<len1>[0-9A-F]{2})(?P<len2>[0-9A-F]{2})68(?P<ctrl>[0-9A-F]{2})(?P<addr>[0-9A-F]{10})(?P<di>[0-9A-F]{2})(?P<seq>[0-9A-F]{2})[0-9A-F]+16$`)
+		`^68(?P<len1>[0-9A-F]{2})(?P<len2>[0-9A-F]{2})(?P<len1>[0-9A-F]{2})(?P<len2>[0-9A-F]{2})68(?P<ctrl>[0-9A-F]{2})(?P<addr>[0-9A-F]{10})(?P<di>[0-9A-F]{2})(?P<seq>[0-9A-F]{2})[0-9A-F]+16$`)
 
 	patternPUSAI = regexp.MustCompile(
 		`^7E(?P<ctrl>[0-9A-F]{2})(?P<body>[0-9A-F]+)7E$`)
@@ -28,9 +28,10 @@ var (
 		`^FEFE7E(?P<ctrl>[0-9A-F]{2})(?P<addr>[0-9A-F]{12})(?P<seq>[0-9A-F]{2})[0-9A-F]+7E$`)
 )
 
-// 协议特征编码与匹配次序：按序匹配，先命中先返回。
-// 次序同时是歧义消解规则——当一条帧在结构上可能命中多条模式时，
-// 编号靠前者优先（如普赛热量表 30 先于普赛调节阀 400）。
+// 协议特征编码与匹配次序：按序遍历，先命中先返回，仅为实现层面的确定性 tie-breaker。
+// 各模式的唯一性由定界符、长度域、特定字节串与正则结构等多重条件在协议分析阶段保证，
+// 正常建模下各模式互不交叉命中；该遍历次序不应被依赖为歧义消解机制
+// （如普赛集抄器 30 先于普赛温控阀 400 仅为稳定返回顺序，非消歧规则）。
 type protocolPattern struct {
 	code    int
 	name    string
@@ -38,12 +39,12 @@ type protocolPattern struct {
 }
 
 var protocolTable = []protocolPattern{
-	{40, "德宝热量表", patternDEBAO},
-	{30, "普赛热量表", patternPUSAI},
-	{20, "德尔采集器", patternDEER},
-	{200, "琅卡博阀门", patternLANGKABO},
-	{300, "博思达阀门", patternBOSIDA},
-	{400, "普赛调节阀", patternPUSAIVALVE},
+	{40, "德宝集抄器", patternDEBAO},
+	{30, "普赛集抄器", patternPUSAI},
+	{20, "德尔集抄器", patternDEER},
+	{200, "琅卡博温控阀", patternLANGKABO},
+	{300, "博思达温控阀", patternBOSIDA},
+	{400, "普赛温控阀", patternPUSAIVALVE},
 }
 
 func patternByCode(code int) *protocolPattern {
