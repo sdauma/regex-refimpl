@@ -36,18 +36,20 @@ regex-refimpl simvalve  [-server 127.0.0.1:9047] [-bind 127.0.0.3] [-addr 192712
 # 发起反向控制指令（变 IP 下亦可正确投递）
 regex-refimpl control   -device BSD-V-19271234001111 -opening 50 [-rpc http://127.0.0.1:3388]
 
-# 运行实验（准确性 / 变 IP 恢复 / 性能基准）
-regex-refimpl experiment accuracy|ipchange|bench
+# 运行实验（准确性 / 变 IP 恢复 / 性能基准 / 跨协议误匹配）
+regex-refimpl experiment accuracy|ipchange|bench|xmatch
 ```
 
 ## 复现论文实验
 
 配套的实验输出数据位于本目录（`regex-refimpl`）：
 
+- `accuracy_result.txt`：匹配准确性实验结果（合规帧识别与解析、畸形帧拒收），对应正文 `expAccuracy`。
 - `bench_result.txt`：性能基准结果（单帧多模式匹配时延，对应正文引用路径 `regex-refimpl/bench_result.txt`）。
-- `ipchange_result.txt`：变 IP 反向控制恢复实验结果。
+- `ipchange_result.txt`：变 IP 反向控制恢复实验结果，对应正文 `expIPChange`。
+- `xmatch_result.txt`：跨协议误匹配矩阵（各协议帧仅被所属模式命中），对应正文 `expXMatch`。
 
-准确性实验（`experiment accuracy`，参考实现记为 `expAccuracy`）在每次运行时由程序构造并校验 1204 条合规帧与 90 条畸形帧，不另存静态数据文件。论文第 4 章的准确性、变 IP 反向控制、性能论据等数据均由上述命令与数据文件对应产生。
+准确性实验（`experiment accuracy`，参考实现记为 `expAccuracy`）在每次运行时由程序构造并校验 1204 条合规帧与 90 条畸形帧，不另存静态数据文件；其余三项实验的输出如上所列。论文第 4 章的准确性、变 IP 反向控制、性能论据、跨协议误匹配等数据均由上述命令与数据文件对应产生。
 
 ## 目录说明
 
